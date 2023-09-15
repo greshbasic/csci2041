@@ -15,9 +15,15 @@ let rec generate_duck_helper duckNum currentNum =
         fullStanza :: generate_duck_helper duckNum (currentNum - 1)
     else if currentNum = 0 then
         let firstLine = "Mama duck went swimming one day \nOver the hills and far away \nThe mama duck said, " ^ "\"Quack, quack, quack, quack\"" in
-        let secondLine = ("\nAnd all " ^ string_of_int duckNum ^ " little ducks came back") in
-        let fullStanza = firstLine ^ secondLine in
-        fullStanza :: generate_duck_helper duckNum (currentNum - 1)
+        let secondLine = "\nAnd all " ^ string_of_int duckNum ^ " little duck" in
+        if duckNum = 1 then
+            let thirdLine = " came back" in
+            let fullStanza = firstLine ^ secondLine ^ thirdLine in
+            fullStanza :: generate_duck_helper duckNum (currentNum - 1)
+        else 
+            let thirdLine = "s came back" in
+            let fullStanza = firstLine ^ secondLine ^ thirdLine in
+            fullStanza :: generate_duck_helper duckNum (currentNum - 1)
     else
         []
 
