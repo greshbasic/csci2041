@@ -5,10 +5,21 @@ type exercise =
 
 let plus x y = Some (x + y)
 
+let divide x y = Some (x / y)
+
 (* TODO *)
-let divide_proper (x: int) (y: int) : int option = 
-        failwith "TODO"
- 
+let divide_proper (x: int) (y: int) : int option =
+    match y with
+    | 0 -> None
+    | _ -> match (x,y) with
+            | (a, b) -> divide a b
+
+    
+let divide_lifted x y = 
+    match (x,y) with
+    | (Some a, Some b) -> divide_proper a b
+    | _ -> None
+
 let plus_lifted x y =
 	match (x,y) with
 	| (Some a, Some b) -> plus a b
@@ -18,11 +29,14 @@ let rec eval (e: exercise) : int option =
 	match e with
 	| Int i -> (Some i)
 	| Add (e1, e2) -> plus_lifted (eval e1) (eval e2)
-	(* TODO: Add a case for division *)
+	| Div (e1, e2) -> divide_lifted (eval e1) (eval e2)
 
 (* TODO *)
 let rec string_of_exercise (e: exercise) : string =
-        failwith "TODO"
+        match e with
+        | Int i -> string_of_int i
+        | Add (e1, e2) -> "(" ^ string_of_exercise e1 ^ " + " ^ string_of_exercise e2 ^ ")"
+        | Div (e1, e2) -> "(" ^ string_of_exercise e1 ^ " / " ^ string_of_exercise e2 ^ ")"
 
 
 (* Tests for plus *)
@@ -70,6 +84,6 @@ let run_all_tests () =
     print_endline "All tests passed!"
 
 (*  UNCOMMENT THE BELOW LINE TO RUN TESTS *)
-(*
+
 let _ = run_all_tests ()
-*)
+
