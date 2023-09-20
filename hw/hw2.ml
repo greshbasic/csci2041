@@ -7,17 +7,33 @@ let exercise_one = (Mult (Plus (Plus (Mult (Int 3, 15), 0), 2), 1))
 let exercise_two = Mult (Plus (Mult (Plus (Int 0, 4), 1), 0), 6)
 let exercise_three = (Int 64)
 
+
+let add x y = Some(x + y)
+let multiply x y = Some (x * y)
+
 let rec solution (prob : exercise) :  int =
-        raise (Failure "This function is not implemented")
+        match prob with
+        | Int i -> (Some i)
+        | Mult (x,y) -> multiply (solution x) (solution y)
+        | Plus (x,y) -> add (solution x)  (solution y)
 
 let rec string_of_exercise (prob : exercise) : string =
-        raise (Failure "This function is not implemented")
+        match prob with
+        | Int i -> string_of_int i
+        | Mult (x,y) -> string_of_int x ^ " * " ^ string_of_int y ^ " -> "
+        | Plus (x,y) -> string_of_int x ^ " + " ^ string_of_int y ^ " -> "
+
 
 let string_of_solution (prob : exercise) : string =
-        raise (Failure "This function is not implemented")
+        (string_of_exercise prob) ^ " -> " ^ string_of_int (solution prob)
 
 let rec from_random  (nums : int list) (signs : bool list) : exercise =
-        raise (Failure "This function is not implemented")
+        match (nums, signs) with
+        | ([],[]) - > None
+        | (nh::nt, []) -> Int nh
+        | (nh::nt, sh:st) -> match sh with
+                             | true -> Mult ((from_random (nt)(st)), nh) 
+                             | false -> Plus ((from_random (nt)(st)), nh)
 
 let rec filterNonTrivial (prob : exercise) : exercise =
         raise (Failure "This function is not implemented")
