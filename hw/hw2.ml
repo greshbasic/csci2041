@@ -41,14 +41,14 @@ let rec from_random  (nums : int list) (signs : bool list) : exercise =
 let rec filterNonTrivial (prob : exercise) : exercise =
         match prob with
         | Int i -> Int i
-        | Mult (x,y) -> match (x,y) with
+        | Mult (x,y) -> ( match (x,y) with
                         | (Int 1, _) -> Int y
                         | (_, 1) -> Int x
-                        | _ -> Mult(filterNonTrivial(x))
-        | Plus (x,y) -> match (x,y) with
+                        | _ -> Mult(filterNonTrivial(x), filterNonTrivial(y)) )
+        | Plus (x,y) -> ( match (x,y) with
                         | (Int 0, _) -> Int y
                         | (_, 0) -> Int x
-                        | _ -> Plus(filterNonTrivial(x))
+                        | _ -> Plus(filterNonTrivial(x), filterNonTrivial(y)) )
 
 let rec splitOnMultZero (prob : exercise) : (exercise * exercise) option =
         raise (Failure "This function is not implemented")
