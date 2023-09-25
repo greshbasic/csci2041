@@ -42,13 +42,13 @@ let rec filterNonTrivial (prob : exercise) : exercise =
         match prob with
         | Int i -> Int i
         | Mult (x,y) -> ( match (x,y) with
-                        | (Int 1, _) -> Int y
-                        | (_, 1) -> Int x
-                        | _ -> Mult(filterNonTrivial(x), filterNonTrivial(y)) )
+                        | (Int 1, _) -> y
+                        | (_, 1) -> x
+                        | _ -> Mult(filterNonTrivial(x), y))
         | Plus (x,y) -> ( match (x,y) with
-                        | (Int 0, _) -> Int y
-                        | (_, 0) -> Int x
-                        | _ -> Plus(filterNonTrivial(x), filterNonTrivial(y)) )
+                        | (Int 0, _) -> y
+                        | (_, 0) -> x
+                        | _ -> Plus(filterNonTrivial(x), y)) 
 
 let rec splitOnMultZero (prob : exercise) : (exercise * exercise) option =
         raise (Failure "This function is not implemented")
