@@ -8,35 +8,47 @@ let exercise_two = Mult (Plus (Mult (Plus (Int 0, 4), 1), 0), 6)
 let exercise_three = (Int 64)
 
 
-let add x y = Some(x + y)
-let multiply x y = Some (x * y)
+let add x y = x + y
+let multiply x y = (x * y)
 
 let rec solution (prob : exercise) :  int =
         match prob with
-        | Int i -> (Some i)
-        | Mult (x,y) -> multiply (solution x) (solution y)
-        | Plus (x,y) -> add (solution x)  (solution y)
+        | Int i -> i
+        | Mult (x,y) -> multiply (solution x) y
+        | Plus (x,y) -> add (solution x) y
 
 let rec string_of_exercise (prob : exercise) : string =
         match prob with
         | Int i -> string_of_int i
-        | Mult (x,y) -> string_of_int x ^ " * " ^ string_of_int y ^ " -> "
-        | Plus (x,y) -> string_of_int x ^ " + " ^ string_of_int y ^ " -> "
+        | Mult (x,y) -> (string_of_exercise x) ^ " * " ^ (string_of_int y) ^ " -> " ^ "... "
+        | Plus (x,y) -> (string_of_exercise x) ^ " + " ^ (string_of_int y) ^ " -> " ^ "... "
 
-
-let string_of_solution (prob : exercise) : string =
-        (string_of_exercise prob) ^ " -> " ^ string_of_int (solution prob)
+let rec string_of_solution (prob : exercise) : string =
+        match prob with
+        | Int i -> string_of_int i
+        | Mult (x,y) -> (string_of_solution x) ^ " * " ^ (string_of_int y) ^ " -> " ^ string_of_int (solution prob)
+        | Plus (x,y) -> (string_of_solution x) ^ " + " ^ (string_of_int y) ^ " -> " ^ string_of_int (solution prob)
 
 let rec from_random  (nums : int list) (signs : bool list) : exercise =
         match (nums, signs) with
-        | ([],[]) - > None
+        | ([],[]) -> Int 0
+        | ([], _) -> Int 0
         | (nh::nt, []) -> Int nh
-        | (nh::nt, sh:st) -> match sh with
+        | (nh::nt, sh::st) -> match sh with
                              | true -> Mult ((from_random (nt)(st)), nh) 
                              | false -> Plus ((from_random (nt)(st)), nh)
 
 let rec filterNonTrivial (prob : exercise) : exercise =
-        raise (Failure "This function is not implemented")
+        match prob with
+        | Int i -> Int i
+        | Mult (x,y) -> match (x,y) with
+                        | (Int 1, _) -> Int y
+                        | (_, 1) -> Int x
+                        | _ -> Mult(filterNonTrivial(x))
+        | Plus (x,y) -> match (x,y) with
+                        | (Int 0, _) -> Int y
+                        | (_, 0) -> Int x
+                        | _ -> Plus(filterNonTrivial(x))
 
 let rec splitOnMultZero (prob : exercise) : (exercise * exercise) option =
         raise (Failure "This function is not implemented")
