@@ -38,11 +38,17 @@ let rec from_random  (nums : int list) (signs : bool list) : exercise =
                              | true -> Mult ((from_random (nt)(st)), nh) 
                              | false -> Plus ((from_random (nt)(st)), nh)
 
-let rec filterNonTrivial (prob : exercise) : exercise = 
-        raise (Failure "This function is not implemented")
+let rec filterNonTrivial (prob : exercise) : exercise = match prob with
+        | Mult (x, 1) -> filterNonTrivial x
+        | Mult (Int 1, num) -> filterNonTrivial((Int num))
+        | Plus (x , 0) -> filterNonTrivial x
+        | Plus (Int 0, num) -> filterNonTrivial((Int num))
+        | Plus (x, num) -> Plus ((filterNonTrivial(x)),num)
+        | Mult (x, num) -> Mult ((filterNonTrivial(x)),num)
+        | x -> x
+        
 
 let rec splitOnMultZero (prob : exercise) : (exercise * exercise) option =
-        raise (Failure "This function is not implemented")
 
 let rec keepSplitting (prob : exercise) : exercise list =
         raise (Failure "This function is not implemented")
