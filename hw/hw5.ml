@@ -28,18 +28,6 @@ struct
       | (None, Some y) -> Some(max y num)
       | _ -> Some(num)
     )
-
-    let rec tmin t =
-      let min x y = if x <= y then x else y in
-      match t with
-      | Leaf -> None
-      | Node (num, left, right) -> (
-        match (tmin left), (tmin right) with
-        | (Some x, Some y) -> Some(min (min x y) num)
-        | (Some x, None) -> Some(min x num)
-        | (None, Some y) -> Some(min y num)
-        | _ -> Some(num)
-      )
           
   let rec flatten t =
     match t with
