@@ -16,7 +16,7 @@ struct
     | Leaf -> 0
     | Node (num, left, right) -> num + sum(left) + sum(right)
   
-  let max x y = if x >= y then x else y in
+  let max x y = if x >= y then x else y
                                       
   let rec tmax t =
     match t with
