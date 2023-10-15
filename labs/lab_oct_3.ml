@@ -6,7 +6,7 @@ let ( >>= ) (opt: 'a option) (f: ('a -> 'b option)) : 'b option =
     | None -> None
 
 (* only uncomment the following if your OCaml version is 4.08 or greater 
-	let ( let* ) = ( >>= ) 
+	let ( let* ) = ( >>= )
 *)
 
 let return x = Some x
