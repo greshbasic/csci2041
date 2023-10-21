@@ -17,100 +17,173 @@ struct
     | S c -> plus (S a) c
 end
 
------------------------------------------------------------------------------------------------
+***** HELPER LEMMA *****
+    Prove plus a (S b) = S (plus a b)
+    Base case: b = Zero
+    Show: plus Zero (S Zero) = S (plus Zero Zero)
+
+        plus Zero (S b) 
+    = { case }
+        plus Zero (S Zero)
+    = { plus def }
+        let rec plus a b =
+            match S Zero with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { apply match }
+        plus (S Zero) Zero
+    = { plus def }
+        let rec plus a b =
+            match Zero with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { apply match }
+        (S zero)
+    = { apply match }
+        let rec plus a b =
+            match Zero with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { plus def }
+        S (plus Zero Zero)
+    = { case }
+        S (plus Zero b)
+
+    Induction step: b = S n
+    Induction Hypothesis (IH): plus a b = S (plus a b)
+
+        plus a b 
+    = { case }
+        plus (S a) (S (S n))
+    = { plus def }
+        let rec plus a b =
+            match (S (S n)) with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { apply match }
+        plus (S (S a)) (S n)
+    = { plus def }
+        let rec plus a b =
+            match (S n) with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { apply match }
+        plus (S (S (S a))) n
+
+
+
+    ..
+
+        S (plus (S a) (S (S n))
+    = { case }
+        S (plus a b)
+
+*************************
+----------------------------------------------------------------------------------------------
 
 P1) Prove plus Zero b = b
-Base case: b = Zero
-Show: plus Zero Zero = Zero
+    Base case: b = Zero
+    Show: plus Zero Zero = Zero
 
-    plus Zero b 
-= { case }
-    plus Zero Zero 
-= { def plus }
-    let rec plus a b =
-        match Zero with
-        | Zero -> a
-        | S c -> plus (S a) c
-= { apply match }
-    a
-= { case }
-    Zero
+        plus Zero b 
+    = { case }
+        plus Zero Zero 
+    = { def plus }
+        let rec plus a b =
+            match Zero with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { apply match }
+        a
+    = { case }
+        Zero
 
-Induction step: b = S n
-Induction hypothesis (IH): plus Zero (S n) = S n
+    Induction step: b = S n
+    Induction hypothesis (IH): plus Zero b = b
 
-    plus Zero b 
-= { case }
-    plus Zero (S n)
-= { plus def }
-    let rec plus a b =
-        match (S n) with
-        | Zero -> a
-        | S c -> plus (S a) c
-= { apply match }
-    plus (S Zero) n
-= { plus def }
-    let rec plus a b =
-        match n with
-        | Zero -> a
-        | S c -> plus (S a) c
-= { apply match }
-    (S Zero)
-= { IS }
-    S b 
-= { case }
-    S n
+        plus Zero b 
+    = { case }
+        plus Zero (S n)
+    = { HELPER LEMMA }              // 0 + (1 + n) = 1 + (0 + n)
+        S (plus Zero n)
+    = { IH }
+        S n
+    = { case }
+        b 
 
-
-
+----------------------------------------------------------------------------------------------
 P2) Prove plus a b = plus b a
-Base case: Given any a = S n, prove that for b = Zero statement holds true
+    Base case: Given any a = S n, prove that for b = Zero statement holds true
 
-    plus a b 
-= { case }
-    plus (S n) Zero
-= { plus def }
-    let rec plus a b =
-        match Zero with
-        | Zero -> a
-        | S c -> plus (S a) c
-= { apply match }
-    a
-= { case }
-    (S n)
-= { apply reverse match }
+        plus a b 
+    = { case }
+        plus (S n) Zero
+    = { plus def }
+        let rec plus a b =
+            match Zero with
+            | Zero -> a
+            | S c -> plus (S a) c
+    = { apply match }
+        S n            
+    = { P1 }                // (n+1) = (n+1) + 0
+        plus Zero (S n)
+    = { case }
+        plus b a
 
+    Induction: Given any a, assume statement holds for b. Show for S b
+    IH: for all a = n, plus n b = plus b n
 
-    plus a b 
-= { case }
-    plus Zero (S n)
-= { plus def }
-    let rec plus a b =
-        match (S n) with
-        | Zero -> a
-        | S c -> plus (S a) c
-= { apply match }
-    plus (S Zero) n
-= { plus def }
-    let rec plus a b =
-        match n with
-        | Zero -> a
-        | S c -> plus (S a) c
-= { apply match }
-    (S Zero)
-= { case }
-    S n
+        plus a b
+    = { case }
+        plus (S a) b
+    = {IH}
+        plus b (S a)
+    = { case }
+        plus b a
 
+                                                                                = ...
+                                                                                plus (S a) b
+                                                                                = {IH}
+                                                                                plus b (S a)
+                                                                                = ...
 
-Induction: Given any a, assume statement holds for b. Show for S b
-IH: for all a = n, plus n b = plus b n
-
-
-= ...
-plus (S a) b
-= {IH}
-plus b (S a)
-= ...
-
-
+----------------------------------------------------------------------------------------------
 P3) Prove plus a (plus b c) = plus (plus a b) c
+
+    Base case: b = Zero 
+
+        plus a (plus b c)
+    = { case }
+        plus a (plus Zero c)
+    = { P1 }
+        plus a c 
+    = { P1 }
+        plus (plus a Zero) c
+    = { case }
+        plus (plus a b) c
+
+    Induction step: b = S n
+    Induction hypothesis (IH): plus a (plus b c) = plus (plus a b) c
+
+        plus a (plus b c)
+    = { case }
+        plus a (plus (S n) c)
+    = { LEMMA }
+        plus a (S (plus n c))
+    = { LEMMA }
+        S (plus a (plus n c))
+    = { IH }
+        S (plus (plus a n) c)     
+    = { LEMMA }                     a = plus a n, b = c -> S (plus a b)
+        plus S(plus a n) c
+    = { LEMMA }                     a = a, b = n, -> plus a (S b)
+        plus (plus a (S n) c)
+    = { case }
+        plus (plus a b) c
+
+
+
+
+
+plus a (S b) = S (plus a b)
+----------------------------------------------------------------------------------------------
