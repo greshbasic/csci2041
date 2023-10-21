@@ -20,7 +20,7 @@ end
 -----------------------------------------------------------------------------------------------
 
 P1) Prove plus Zero b = b
-Base case: b =  Zero
+Base case: b = Zero
 Show: plus Zero Zero = Zero
 
     plus Zero b 
@@ -48,26 +48,62 @@ Induction hypothesis (IH): plus Zero (S n) = S n
         | Zero -> a
         | S c -> plus (S a) c
 = { apply match }
-    plus (S Zero) (S n)
+    plus (S Zero) n
+= { plus def }
+    let rec plus a b =
+        match n with
+        | Zero -> a
+        | S c -> plus (S a) c
+= { apply match }
+    (S Zero)
+= { IS }
+    S b 
+= { case }
+    S n
+
+
+
+P2) Prove plus a b = plus b a
+Base case: Given any a = S n, prove that for b = Zero statement holds true
+
+    plus a b 
+= { case }
+    plus (S n) Zero
+= { plus def }
+    let rec plus a b =
+        match Zero with
+        | Zero -> a
+        | S c -> plus (S a) c
+= { apply match }
+    a
+= { case }
+    (S n)
+= { apply reverse match }
+
+
+    plus a b 
+= { case }
+    plus Zero (S n)
 = { plus def }
     let rec plus a b =
         match (S n) with
         | Zero -> a
         | S c -> plus (S a) c
 = { apply match }
-    plus (S (S Zero)) (S n)
-    # how to show it going down to 0?
-
-
-
-
-
-P2) Prove plus a b = plus b a
-Base case: Given any a, prove that for b = Zero statement holds true
+    plus (S Zero) n
+= { plus def }
+    let rec plus a b =
+        match n with
+        | Zero -> a
+        | S c -> plus (S a) c
+= { apply match }
+    (S Zero)
+= { case }
+    S n
 
 
 Induction: Given any a, assume statement holds for b. Show for S b
-IH: for all a, plus a b = plus b a
+IH: for all a = n, plus n b = plus b n
 
 
 = ...
