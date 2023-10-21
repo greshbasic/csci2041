@@ -115,9 +115,9 @@ Case x = Some z
 = { bind def }
 	match Some z with
 	| None -> None
-	| Some a -> fun a
+	| Some a -> (fun y -> g y >>= h) a
 = { apply match }
-	fun z
+	(fun y -> g y >>= h) z
 = { fun def }
 	g z >>= h
 = { bind def }
@@ -148,28 +148,22 @@ Case x = None:
 = { case }
 	return None >>= f
 = { return def }
-	None >>= f
+	Some None >>= f
 = { bind def }
-	match None with
+	match Some None with
 	| None -> None
 	| Some a -> f a
 = { apply match }
-	None
+	f None
 = { case }
-	x
+	f x
 
 ---- f x when x = None ----
 	f x
 = { case }
 	f None
-= { bind def }
-	match None with
-	| None -> None
-	| Some a -> f a
-= { apply match }
-	None
 = { case }
-	x
+	f x
 -------------------------------------------------
 ---- return x >>= f when x = Some y ----
 Case x = Some y:
@@ -178,13 +172,13 @@ Case x = Some y:
 = { case }
 	return Some y >>= f
 = { return def }
-	Some y >>= f
+	Some (Some y) >>= f
 = { bind def }
-	match Some y with
+	match Some (Some y) with
 	| None -> None
 	| Some a -> f a
 = { apply match }
-	f y
+	f (Some y)
 = { case }
 	f x
 
@@ -192,12 +186,6 @@ Case x = Some y:
 	f x
 = { case }
 	f Some y
-= { bind def }
-	match Some y with
-	| None -> None
-	| Some a -> f a
-= { apply match }
-	f y
 = { case }
 	f x
 
@@ -220,7 +208,7 @@ Prove:
 ```
 By cases on (x: 'a option):
 
-Case x = None:
+----Case x = None, y = None----
 	x >>= (fun x' -> y >>= (fun y' -> plus x' y'))
 = { case }
 	None >>= (fun x' -> y >>= (fun y' -> plus x' y'))
@@ -239,9 +227,19 @@ Case x = None:
 		match x with 
 		| None -> None
 		| Some x' -> plus x' y')
- 
+= { case }
+	match None with 
+	| None -> None
+	| Some y' -> (
+		match x with 
+		| None -> None
+		| Some x' -> plus x' y')
+ = { apply match }
+	None
+= { case }
+	x
 
- Case x = Some z
+ ----Case x = Some a, y = None----
 	x >>= (fun x' -> y >>= (fun y' -> plus x' y'))
 = { case }
 	Some z >>= (fun x' -> y >>= (fun y' -> plus x' y'))
@@ -254,17 +252,131 @@ Case x = None:
 = { fun def }
 	y >>= (fun y' -> plus x' y')
 = { bind def }
-	match Some y with
+	match Some None with
 	| None -> None
-	| Some a -> fun y
+	| Some a -> plus x' None
 = { apply match }
-	fun y
-= { fun def }
-	plus z y
+	plus a None
 = { case }
-	plus x y
+	plus x None
 = { eval }
+	None
+= { case }
+	y
+
+	match y with 
+	| None -> None
+	| Some y' -> (
+		match x with 
+		| None -> None
+		| Some x' -> plus x' y')
+= { case }
+	match None with 
+	| None -> None
+	| Some y' -> (
+		match Some a with 
+		| None -> None
+		| Some x' -> plus x' y')
+= { apply match }
+	None
+= { case }
+	y
+
+----Case x = None, y = Some b----
+	x >>= (fun x' -> y >>= (fun y' -> plus x' y'))
+= { case }
+	None >>= (fun x' -> y >>= (fun y' -> plus x' y'))
+= { bind def }
+	match None with
+	| None -> None
+	| Some a -> fun a
+= { apply match }
+	None
+= { case }
+	x
+
+match y with 
+	| None -> None
+	| Some y' -> (
+		match x with 
+		| None -> None
+		| Some x' -> plus x' y')
+= { case }
+	match Some b with
+	| None -> None
+	| Some y' -> (
+		match x with 
+		| None -> None
+		| Some x' -> plus x' y')
+= { apply match }
+	match None with 
+	| None -> None
+	| Some x' -> plus x' y'
+= { apply match }
+	None
+= { case }
+	x
+
+----Case x = Some a, y = Some b----
+	x >>= (fun x' -> y >>= (fun y' -> plus x' y'))
+= { case }
+	Some a >>= (fun x' -> y >>= (fun y' -> plus x' y'))
+= { bind def }
+	match Some a with
+	| None -> None
+	| Some a -> (fun a -> y >>= (fun y' -> plus x' y'))
+= { apply match }
+	fun a -> y >>= (fun y' -> plus Some a y')
+= { fun def }
+	y >>= (fun y' -> plus Some a y')
+= { case }
+	Some b >>= (fun y' -> plus Some a y')
+= { bind def }
+	match Some b with
+	| None -> None
+	| Some a -> (fun y' -> plus Some a y')
+= { apply match }
+	fun b -> plus Some a Some b
+= { fun def }
+	plus Some a Some b
+= { eval }
+	Some a + Some b
+= { case }
 	x + y
+
+
+match y with 
+	| None -> None
+	| Some y' -> (
+		match x with 
+		| None -> None
+		| Some x' -> plus x' y')
+= { case }
+	match Some b with
+	| None -> None
+	| Some y' -> (
+		match x with 
+		| None -> None
+		| Some x' -> plus x' y')
+= { apply match }
+	match Some a with 
+	| None -> None
+	| Some x' -> plus x Some b
+= { apply match }
+	plus Some a Some b
+= { eval }
+	Some a + Some b
+= { case }
+	x + y
+
+
+It is shown that for all possible values of X, both methods provide the same results, thus we have proven the statement true for any (x: 'a option)
+
+
+
+
+
+
 
 
 
