@@ -102,7 +102,7 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                      = { Max definition }
                         let rec max a b =
                            match (S n, Zero) with
-                           | (Zero, x) -> x
+                           | (Zero, x) -> x 
                            | (x, Zero) -> x
                            | (S x, S y) -> S (max x y)
                      = { apply match }
@@ -120,5 +120,27 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
     (Why are these the only cases you need to consider?) *)
 
     Prove: Max.op a (Max.op b c) = Max.op (Max.op a b) c
-    
-      
+
+    Base Case: c = Zero (b = S m, a = S n)
+
+                        Max.op a (Max.op b c)
+                    = { case }
+                        Max.op (S n) (Max.op (S m) Zero)
+                    = { Max definition }
+                        let rec max a b =
+                           match (S m, Zero) with
+                           | (Zero, x) -> x 
+                           | (x, Zero) -> x
+                           | (S x, S y) -> S (max x y)
+                    = { apply match }
+                        Max.op (S n) (S m)
+                    = { apply match } 
+                        let rec max a b =
+                           match ((Max.op (S n) (S m)), Zero) with
+                           | (Zero, x) -> x 
+                           | (x, Zero) -> x
+                           | (S x, S y) -> S (max x y)
+                    = { Max definition }
+                        Max.op (Max.op (S n) (S m)) Zero
+                    = { case }
+                        Max.op (Max.op a b) c
