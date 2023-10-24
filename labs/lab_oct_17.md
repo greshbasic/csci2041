@@ -102,12 +102,7 @@ Case x = Some z
 	| Some a -> g a
 = { apply match }
 	(g z) >>= h
-= { bind def }
-	match (g z)with
-	| None -> None
-	| Some a -> h a
-= { apply match }
-	h (g z)
+
 
 	x >>= (fun y -> g y >>= h)
 = { case }
@@ -120,12 +115,7 @@ Case x = Some z
 	(fun y -> g y >>= h) z
 = { fun def }
 	g z >>= h
-= { bind def }
-	match (g z) with
-	| None -> None
-	| Some a -> h a
-= { apply match }
-	h (g z)
+
 -------------------------------------------------
 
 It is shown that for all possible values of X, return (x >>= g) >>= h and x >>= (fun y -> g y >>= h) are equivalent, thus we have proven the statement true for any (x: 'a option)
@@ -158,12 +148,6 @@ Case x = None:
 = { case }
 	f x
 
----- f x when x = None ----
-	f x
-= { case }
-	f None
-= { case }
-	f x
 -------------------------------------------------
 ---- return x >>= f when x = Some y ----
 Case x = Some y:
@@ -182,12 +166,6 @@ Case x = Some y:
 = { case }
 	f x
 
----- f x when x = Some y ----
-	f x
-= { case }
-	f Some y
-= { case }
-	f x
 
 It is shown that for all possible values of X, return x >>= f and f x are equivalent, thus we have proven the statement true for any (x: 'a option)
 
@@ -242,27 +220,22 @@ By cases on (x: 'a option):
  ----Case x = Some a, y = None----
 	x >>= (fun x' -> y >>= (fun y' -> plus x' y'))
 = { case }
-	Some z >>= (fun x' -> y >>= (fun y' -> plus x' y'))
+	Some z >>= (fun x' -> None >>= (fun y' -> plus x' y'))
 = { bind def }
 	match Some z with
 	| None -> None
-	| Some a -> fun a
+	| Some a -> (fun x' -> None >>= (fun y' -> plus x' y')) a
 = { apply match }
-	fun z >>= (fun y' -> plus x' y')
+	(fun x' -> y >>= (fun y' -> plus x' y')) a
 = { fun def }
-	y >>= (fun y' -> plus x' y')
+	None >>= (fun y' -> plus  y')
 = { bind def }
-	match Some None with
+	match None with
 	| None -> None
 	| Some a -> plus x' None
-= { apply match }
-	plus a None
-= { case }
-	plus x None
-= { eval }
+= {apply match}
 	None
-= { case }
-	y
+
 
 	match y with 
 	| None -> None
@@ -279,8 +252,7 @@ By cases on (x: 'a option):
 		| Some x' -> plus x' y')
 = { apply match }
 	None
-= { case }
-	y
+
 
 ----Case x = None, y = Some b----
 	x >>= (fun x' -> y >>= (fun y' -> plus x' y'))
@@ -311,7 +283,7 @@ match y with
 = { apply match }
 	match None with 
 	| None -> None
-	| Some x' -> plus x' y'
+	| Some x' -> plus x' b
 = { apply match }
 	None
 = { case }
@@ -324,25 +296,22 @@ match y with
 = { bind def }
 	match Some a with
 	| None -> None
-	| Some a -> (fun a -> y >>= (fun y' -> plus x' y'))
+	| Some a -> (fun x' -> y >>= (fun y' -> plus x' y')) a
 = { apply match }
 	fun a -> y >>= (fun y' -> plus Some a y')
 = { fun def }
-	y >>= (fun y' -> plus Some a y')
+	y >>= (fun y' -> plus a y')
 = { case }
 	Some b >>= (fun y' -> plus Some a y')
 = { bind def }
 	match Some b with
 	| None -> None
-	| Some a -> (fun y' -> plus Some a y')
+	| Some a -> (fun y' -> plus Some a y') b
 = { apply match }
 	fun b -> plus Some a Some b
 = { fun def }
-	plus Some a Some b
-= { eval }
-	Some a + Some b
-= { case }
-	x + y
+	plus  a  b
+
 
 
 match y with 
@@ -363,11 +332,7 @@ match y with
 	| None -> None
 	| Some x' -> plus x Some b
 = { apply match }
-	plus Some a Some b
-= { eval }
-	Some a + Some b
-= { case }
-	x + y
+	plus  a  b
 
 
 It is shown that for all possible values of X, both methods provide the same results, thus we have proven the statement true for any (x: 'a option)

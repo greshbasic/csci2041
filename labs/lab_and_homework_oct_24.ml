@@ -104,7 +104,8 @@ let _ = (module Append : Monoid)
 
 
 
-   - Append.id is a left identity (this one is easy) b
+   - Append.id is a left identity (this one is easy)
+
                Prove: append id x = x
 
                      append id x
