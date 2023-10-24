@@ -166,8 +166,79 @@ let _ = (module Plus : Monoid)
     *)
 
 let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
+(*
+   Prove: Max.op Max.id a = a
 
-(* On associativity of Max.op:
+            Base Case: a = 0
+
+                     Max.op Max.id a
+                  = { case }
+                     Max.op Zero Zero
+                  = { Max definition }
+                     let rec max a b =
+                        match (Zero, Zero) with
+                        | (Zero, x) -> x
+                        | (x, Zero) -> x
+                        | (S x, S y) -> S (max x y)
+                  = { apply match }
+                     Zero
+                  = { case }
+                        a
+            
+            Case: a = S n
+            IH: append Max.id n = n ( why didn't i have to use an IH at all?) 
+            
+                     Max.op Max.id a
+                  = { case }
+                        Max.op Zero (S n)
+                  = { Max definition }
+                     let rec max a b =
+                        match (Zero, S n) with
+                        | (Zero, x) -> x
+                        | (x, Zero) -> x
+                        | (S x, S y) -> S (max x y)
+                  = { apply match }
+                        S n
+                  = { case }
+                        a
+
+
+   Prove: Max.op a Max.id = a
+            Base case: a = Zero
+                        
+                     Max.op a Max.id
+                  = { case }
+                        Max.op Zero Zero
+                  = { Max definition }
+                     let rec max a b =
+                        match (Zero, Zero) with
+                        | (Zero, x) -> x
+                        | (x, Zero) -> x
+                        | (S x, S y) -> S (max x y)
+                  = { apply match }
+                     Zero
+                  = { case }
+                     a   
+                           
+            Case: a = S n
+            IH: append n Max.id = n ( why didn't i have to use an IH at all?)                
+
+                        Max.op a Max.id
+                     = { case }
+                        Max.op (S n) Zero
+                     = { Max definition }
+                        let rec max a b =
+                           match (S n, Zero) with
+                           | (Zero, x) -> x
+                           | (x, Zero) -> x
+                           | (S x, S y) -> S (max x y)
+                     = { apply match }
+                           S n
+                     = { case }                    
+                           a
+            
+*)
+(* On associativity of Max.op:            
     You will need some case distinction inside your inductive step.
     Consider these cases in the inductive step:
      - b = Zero
