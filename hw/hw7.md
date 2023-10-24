@@ -144,3 +144,12 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                         Max.op (Max.op (S n) (S m)) Zero
                     = { case }
                         Max.op (Max.op a b) c
+
+
+        Case: b = Zero
+
+
+        Case: c = Zero
+
+
+        Case: b = S b' and c = S c'
