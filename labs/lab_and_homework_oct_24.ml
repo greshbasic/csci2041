@@ -59,10 +59,106 @@ end
 let _ = (module Append : Monoid)
 (* We just need to add proofs that show that:
    - Append.op is associative (proof is in the slides!)
-   - Append.id is a left identity (this one is easy)
-   - Append.id is a right identity (this one is a straightforward induction on lists)
-   *)
 
+            Case: a = []
+                     append (append a b) c
+                  = {case}
+                     append (append [] b) c
+                  = {definition append}
+                     append (match [] with | [] -> b | (h::tl) -> h::append tl b) c
+                  = {matching pattern}
+                     append b c
+                  = {matching pattern}
+                     match [] with | [] -> append b c
+                     | h::tl -> h::append tl (append b c)
+                  = {definition append}
+                     append [] (append b c)
+                  = {case}
+                     append a (append b c)
+
+            Case: a = h::t
+            Inductive hypothesis’ (IH): append (append tl b) c = append tl (append b c)
+
+                     append (append a b) c
+                  = {case}
+                     append (append (h :: tl) b) c
+                  = {append definition}
+                     append (match h :: tl with [] -> b | h :: tl -> h :: append tl b) c
+                  = {match fits pattern}
+                     append (h :: append tl b) c
+                  = {append definition}
+                     match (h :: append tl b) with [] -> c | h :: tl2 -> h :: append tl2 c
+                  = {match fits pattern}
+                     h :: append (append tl b) c
+                  = {IH}
+                     h :: append tl (append b c)
+                  = {match fits pattern}
+                     match h :: tl with
+                     | [] -> (append b c)
+                     | h :: tl -> h :: append tl
+                     (append b c)
+                  = {append definition}
+                     append (h :: tl) (append b c)
+                  = {case}
+                     append a (append b c)
+
+
+
+   - Append.id is a left identity (this one is easy) b
+               Prove: append id x = x
+
+                     append id x
+                  = { case }
+                     append [] h::t
+                  = { append def }
+                    let rec append a b =
+                        match [] with
+                        | [] -> b
+                        | h::tl -> h::(append tl b)
+                  = { apply match }
+                     h::t
+                  = { case }
+                     x
+
+   - Append.id is a right identity (this one is a straightforward induction on lists)
+
+               Prove: append x id = x
+
+               Base case: x = []
+
+                     append x id
+                  = { case }
+                     append [] []
+                  = { append def }
+                    let rec append a b =
+                        match [] with
+                        | [] -> b
+                        | h::tl -> h::(append tl b)
+                  = { apply match }
+                     []
+                  = { case }
+                     x
+
+               Case: x = h::tl
+               IH: append tl id = tl
+
+                     append x id
+                  = { case }
+                     append h::tl []
+                  = { append def }
+                    let rec append a b =
+                        match tl with
+                        | [] -> b
+                        | h::tl -> h::(append tl b)
+                  = { apply match }
+                     h::(append tl [])
+                  = { IH }
+                     h::tl
+                  = { case }
+                     x
+
+   *)
+               
 let _ = (module Plus : Monoid)
  (* Proofs that this is true were in the previous homework,
     you don't have to repeat them in this homework.
