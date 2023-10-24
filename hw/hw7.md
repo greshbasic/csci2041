@@ -24,18 +24,6 @@ module Max = struct
    let op = max
    let id = Zero
 end
-
-module Combine (M : Monoid) = struct
-   let rec combine_r lst =
-      match lst with
-      | []   -> M.id
-      | h :: t -> M.op h (combine_r t)
-
-   let rec combine_l acc lst =
-      match lst with
-      | []   -> acc
-      | h :: t -> (combine_l (M.op acc h) t)
-end
 ```
 
 let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
@@ -288,7 +276,34 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                   = { case }
                      Max.op (Max.op a b) c 
 
+-----------------------------------------------------------------------------------------------------------------------------------
 
+```ocaml
+module type Monoid = 
+sig
+	type t
+	(** id must be a left identity for op, i.e.
+	    [op id x = x]
+	    And id must also be a right identity, i.e.
+	    [op x id = x] **)
+	val id : t
+	(* op must be associative, i.e.
+	     [op (op x y) z = op x (op y z)] *)
+	val op : t -> t -> t
+end
+
+module Combine (M : Monoid) = struct
+   let rec combine_r lst =
+      match lst with
+      | []   -> M.id
+      | h :: t -> M.op h (combine_r t)
+
+   let rec combine_l acc lst =
+      match lst with
+      | []   -> acc
+      | h :: t -> (combine_l (M.op acc h) t)
+end
+```
 
       Prove combine_r lst = combine_l M.id lst (P4)
       (* 
@@ -296,3 +311,44 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
       M.op a (combine_r lst) = combine_l a lst. The properties about M.op and M.id you are allowed to use are written in the signature (so don't use that M.id = Zero, say; the proofs you did during lab show that that's not even necessarily true).
       *)
 
+
+      Base case: a = []
+
+            M.op a (combine_r lst)
+         = { case }
+            M.op [] (combine_r (h::t))
+         = { combine_r definition }
+            let rec combine_r lst =
+               match h::t with
+               | []   -> M.id
+               | h :: t -> M.op h (combine_r t)
+         = { apply match }
+            M.op [] (M.op h (combine_r t))
+
+            (wtf is M.op..? combine_r? but how does it take in two arguments?)
+
+
+                                                      // say lst = [5;4;3;2;1]
+            combine_l a lst
+         = { case }
+            combine_l [] h::t
+         = { combine_l definition }
+            match h::t with
+            | []   -> acc
+            | h :: t -> (combine_l (M.op accu h) t)
+         = { apply match }
+            combine_l (M.op [] h) t                 // combine_l (M.op accu [5]) [4;3;2;1]
+         = { M.op definition }
+            match h::[] with
+            | []   -> acc
+            | h :: t -> (combine_l (M.op acc h) t)
+         = { apply match }
+            combine_l (combine_l (M.op [] h) []) t
+         = { combine_l definition }
+            match [] with
+            | []   -> acc
+            | h :: t -> (combine_l (M.op acc h) t)
+         = { apply match }
+            combine_l (M.op [] h) t                // bhsufhsjdhsjhdjshdjsdhushdjshdjs
+         
+         
