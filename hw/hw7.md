@@ -84,19 +84,19 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
             Case: a = S n
             IH: append n Max.id = n ( why didn't i have to use an IH at all?)                
 
-                        Max.op a Max.id
-                     = { case }
-                        Max.op (S n) Zero
-                     = { Max definition }
-                        let rec max a b =
-                           match (S n, Zero) with
-                           | (Zero, x) -> x 
-                           | (x, Zero) -> x
-                           | (S x, S y) -> S (max x y)
-                     = { apply match }
-                           S n
-                     = { case }                    
-                           a
+                     Max.op a Max.id
+                  = { case }
+                     Max.op (S n) Zero
+                  = { Max definition }
+                     let rec max a b =
+                        match (S n, Zero) with
+                        | (Zero, x) -> x 
+                        | (x, Zero) -> x
+                        | (S x, S y) -> S (max x y)
+                  = { apply match }
+                        S n
+                  = { case }                    
+                        a
             
 *)
 (* On associativity of Max.op:            
@@ -109,8 +109,53 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 
     Prove: Max.op a (Max.op b c) = Max.op (Max.op a b) c (P3)
 
+         Base case: a = Zero
 
-        Case: b = Zero
+                     Max.op a (Max.op b c)
+                  = { case }
+                     Max.op Zero (Max.op (S b') (S c'))
+                  = { Max definition }
+                     let rec max a b =
+                        match (S b', S c') with
+                        | (Zero, x) -> Max.op Zero x 
+                        | (x, Zero) -> Max.op Zero x
+                        | (S x, S y) -> Max.op Zero (S (max x y))
+                  = { apply match }
+                     Max.op Zero (S (Max.op b' c'))
+                  = { Max definition }
+                     let rec max a b =
+                        match (Zero, (S (max b' c'))) with
+                        | (Zero, x) -> x 
+                        | (x, Zero) -> x
+                        | (S x, S y) -> S (max x y)
+                  = { apply match }        vvv
+                     S (Max.op b' c')
+                  = { apply match }        ^^^
+                      let rec max a b =
+                        match (S b', S c') with
+                        | (Zero, x) -> x 
+                        | (x, Zero) -> x
+                        | (S x, S y) -> S (max x y)
+                  = (Max definition )
+                     Max.op (S b') (S c')
+                  = { apply match }
+                     let rec max a b =
+                        match (Zero, S b') with
+                        | (Zero, x) -> Max.op x (S c')
+                        | (x, Zero) -> Max.op x (S c')
+                        | (S x, S y) -> Max.op (max x y) (S c')
+                  = { Max definition }
+                     Max.op (Max.op Zero (S b')) (S c')
+                  = { case }
+                     Max.op (Max.op a b) c 
+
+
+         Inductive Step: a = S a'
+         Inductive Hypthesis: Max.op a' (Max.op b' c') = Max.op (Max.op a' b') c'
+
+
+            Case: b = Zero
+
                         Max.op a (Max.op b c)
                      = { case }
                         Max.op (S a') (Max.op Zero (S c'))
@@ -192,49 +237,6 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 
 
         Case: b = S b' and c = S c'
-
-            Base case: a = Zero
-
-                     Max.op a (Max.op b c)
-                  = { case }
-                     Max.op Zero (Max.op (S b') (S c'))
-                  = { Max definition }
-                     let rec max a b =
-                        match (S b', S c') with
-                        | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
-                  = { apply match }
-                     Max.op Zero (S (Max.op b' c'))
-                  = { Max definition }
-                     let rec max a b =
-                        match (Zero, (S (max b' c'))) with
-                        | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
-                  = { apply match }        vvv
-                     S (Max.op b' c')
-                  = { apply match }        ^^^
-                      let rec max a b =
-                        match (S b', S c') with
-                        | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
-                  = (Max definition )
-                     Max.op (S b') (S c')
-                  = { apply match }
-                     let rec max a b =
-                        match (Zero, S b') with
-                        | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
-                  = { Max definition }
-                     Max.op (Max.op Zero (S b')) (S c')
-                  = { case }
-                     Max.op (Max.op a b) c 
-
-               Case: a = S a'
-               IH: Max.op a' (Max.op b' c') = Max.op (Max.op a' b') c'
 
                      Max.op a (Max.op b c)
                   = { case }
