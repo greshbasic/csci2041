@@ -25,6 +25,7 @@ module Max = struct
    let id = Zero
 end
 ```
+-----------------------------------------------------------------------------------------------------------------------------------
 
 let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 (*
@@ -105,7 +106,7 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 
     Prove: Max.op a (Max.op b c) = Max.op (Max.op a b) c (P3)
 
-         Base case: a = Zero
+            Base case: a = Zero
 
                      Max.op a (Max.op b c)
                  = { case }
@@ -154,7 +155,7 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                         Max.op (Max.op a b) c
 
 
-        Case: c = Zero
+            Case: c = Zero
 
                         Max.op a (Max.op b c)
                      = { case }
@@ -177,7 +178,7 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                         Max.op (Max.op a b) c
 
 
-        Case: b = S b' and c = S c'
+            Case: b = S b' and c = S c'
 
                      Max.op a (Max.op b c)
                   = { case }
@@ -241,8 +242,14 @@ module Combine (M : Monoid) = struct
       match lst with
       | []   -> acc
       | h :: t -> (combine_l (M.op acc h) t)
+
+      
 end
 ```
+-----------------------------------------------------------------------------------------------------------------------------------
+
+      combine_r [ [3;5] ; [1;4] ];;
+      - : int list = [3; 5; 1; 4]
 
       Prove combine_r lst = combine_l M.id lst (P4)
       (* 
@@ -250,18 +257,98 @@ end
       M.op a (combine_r lst) = combine_l a lst. The properties about M.op and M.id you are allowed to use are written in the signature (so don't use that M.id = Zero, say; the proofs you did during lab show that that's not even necessarily true).
       *)
 
+         Base case: lst = []
 
-      Base case: a = []
+               combine_r lst 
+            = { case }
+               combine_r []
+            = { combine_r definition }
+               match [] with
+               | []   -> M.id
+               | h :: t -> M.op h (combine_r t)
+            = { apply match }
+               M.id
+            = { combine_l definition }
+               match [] with
+               | []   -> acc
+               | h :: t -> (combine_l (M.op acc h) t)
+            = { reverse match }
+               combine_l M.id []
+            = { case }
+               combine_l M.id lst
 
-            M.op a (combine_r lst)
-         = { case }
-            M.op [] (combine_r (h::t))
-         = { combine_r definition }
-            match h::t with
-            | []   -> M.id
-            | h :: t -> M.op h (combine_r t)
-         = { apply match }
-            M.op [] (M.op h (combine_r t))
+         Inductive step: lst = h::t
+         Inductive Hypothesis: combine_r t = combine_l M.id t
 
-          
+               combine_r lst
+            = { case }
+               combine_r h::t
+            = { combine_r definition }
+               match h::t with
+               | []   -> M.id
+               | h :: t -> M.op h (combine_r t)
+            = { apply match }
+               M.op h (combine_r t)
+            = { IH }
+               M.op h (combine_l M.id t) 
+            = { associative property }
+               M.op (combine_l h M.id) t
+            = { left property }
+               combine_l (M.op h M.id) t
+            = { combine_l definition }
+               match h::t with
+               | []   -> acc
+               | h :: t -> (combine_l (M.op acc h) t)
+            = { reverse match }
+               combine_l M.id h::t
+            = { case }
+               combine_l M.id lst
+
+      Prove M.op a (combine_r lst) = combine_l a lst:
          
+         Base case: lst = []
+
+               M.op a (combine_r lst)
+            = { case }
+               M.op a (combine_r [])
+            = { combine_r definition }
+               match [] with
+               | []   -> M.op a (M.id)
+               | h :: t -> M.op h (combine_r t)
+            = { apply match }
+               M.op a M.id
+            = { right identity }
+               a
+            = { combine_l definition }
+               match [] with
+               | []   -> acc
+               | h :: t -> (combine_l (M.op acc h) t)
+            = { reverse match }
+               combine_l a []
+            = { case }
+               combine_l a lst
+
+         Inductive step: lst = h::t
+         Inductive Hypothesis: M.op a (combine_r t) = combine_l a t
+
+               M.op a (combine_r lst)
+            = { case }
+               M.op a (combine_r h::t)
+            = { combine_r definition }
+               match h::t with
+               | []   -> M.op a (M.id)
+               | h :: t -> M.op h (combine_r t)
+            = { apply match }
+               M.op a (M.op h (combine_r t))
+            = { associative property }
+               M.op (M.op a h) (combine_r t)
+            = { IH }
+               combine_l (M.op a h) t
+            = { combine_l definition }
+               match h::t with
+               | []   -> acc
+               | h :: t -> (combine_l (M.op a h) t)
+            = { reverse match }
+               combine_l a h::t
+            = { case }
+               combine_l a lst
