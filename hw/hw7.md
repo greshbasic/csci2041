@@ -1,31 +1,4 @@
-```ocaml
-module type Monoid = 
-sig
-	type t
-	(** id must be a left identity for op, i.e.
-	    [op id x = x]
-	    And id must also be a right identity, i.e.
-	    [op x id = x] **)
-	val id : t
-	(* op must be associative, i.e.
-	     [op (op x y) z = op x (op y z)] *)
-	val op : t -> t -> t
-end
 
-type nat = Zero | S of nat
-
-module Max = struct
-   type t = nat
-   let rec max a b =
-     match (a, b) with
-       | (Zero, x) -> x
-       | (x, Zero) -> x
-       | (S x, S y) -> S (max x y)
-   let op = max
-   let id = Zero
-end
-```
------------------------------------------------------------------------------------------------------------------------------------
 
 let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 (*
@@ -216,35 +189,6 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                      Max.op (Max.op a b) c 
 
 -----------------------------------------------------------------------------------------------------------------------------------
-
-```ocaml
-module type Monoid = 
-sig
-	type t
-	(** id must be a left identity for op, i.e.
-	    [op id x = x]
-	    And id must also be a right identity, i.e.
-	    [op x id = x] **)
-	val id : t
-	(* op must be associative, i.e.
-	     [op (op x y) z = op x (op y z)] *)
-	val op : t -> t -> t
-end
-
-module Combine (M : Monoid) = struct
-   let rec combine_r lst =
-      match lst with
-      | []   -> M.id
-      | h :: t -> M.op h (combine_r t)
-
-   let rec combine_l acc lst =
-      match lst with
-      | []   -> acc
-      | h :: t -> (combine_l (M.op acc h) t)
-
-      
-end
-```
 -----------------------------------------------------------------------------------------------------------------------------------
 
       Prove combine_r lst = combine_l M.id lst (P4)
