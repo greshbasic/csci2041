@@ -1,62 +1,34 @@
-```ocaml
-module type Monoid = 
-sig
-	type t
-	(** id must be a left identity for op, i.e.
-	    [op id x = x]
-	    And id must also be a right identity, i.e.
-	    [op x id = x] **)
-	val id : t
-	(* op must be associative, i.e.
-	     [op (op x y) z = op x (op y z)] *)
-	val op : t -> t -> t
-end
 
-type nat = Zero | S of nat
-
-module Max = struct
-   type t = nat
-   let rec max a b =
-     match (a, b) with
-       | (Zero, x) -> x
-       | (x, Zero) -> x
-       | (S x, S y) -> S (max x y)
-   let op = max
-   let id = Zero
-end
-```
------------------------------------------------------------------------------------------------------------------------------------
 
 let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 (*
    Prove: Max.op Max.id a = a (P1)
 
-            Base Case: a = 0
+            Case: a = 0
 
                      Max.op Max.id a
                   = { case }
                      Max.op Zero Zero
                   = { Max definition }
                      match (Zero, Zero) with
-                     | (Zero, x) -> x
-                     | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (Zero, x) -> Zero
+                     | (x, Zero) -> Zero
+                     | (S x, S y) -> S (Max.op x y)
                   = { apply match }
                      Zero
                   = { case }
                         a
             
             Case: a = S n
-            IH: append Max.id n = n ( why didn't i have to use an IH at all?) 
             
                      Max.op Max.id a
                   = { case }
                         Max.op Zero (S n)
                   = { Max definition }
                      match (Zero, S n) with
-                     | (Zero, x) -> x
+                     | (Zero, x) -> S n
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (Max.op x y)
                   = { apply match }
                         S n
                   = { case }
@@ -64,23 +36,23 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
 
 
    Prove: Max.op a Max.id = a (P2)
-            Base case: a = Zero
+
+            case: a = Zero
                         
                      Max.op a Max.id
                   = { case }
                         Max.op Zero Zero
                   = { Max definition }
                      match (Zero, Zero) with
-                     | (Zero, x) -> x
-                     | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (Zero, x) -> Zero
+                     | (x, Zero) -> Zero
+                     | (S x, S y) -> S (Max.op x y)
                   = { apply match }
                      Zero
                   = { case }
                      a   
                            
-            Case: a = S n
-            IH: append n Max.id = n ( why didn't i have to use an IH at all?)                
+            Case: a = S n           
 
                      Max.op a Max.id
                   = { case }
@@ -88,8 +60,8 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                   = { Max definition }
                      match (S n, Zero) with
                      | (Zero, x) -> x 
-                     | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (x, Zero) -> S n
+                     | (S x, S y) -> S (Max.op x y)
                   = { apply match }
                         S n
                   = { case }                    
@@ -113,16 +85,16 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                      Max.op Zero (Max.op b c)
                   = { Max definition }
                      match (Zero, (Max.op b c)) with
-                     | (Zero, x) -> x 
+                     | (Zero, x) -> (Max.op b c)
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (Max.op x y)
                   = { apply match }
                      Max.op b c
                   = { Max definition }
                      match (Zero, b) with
-                     | (Zero, x) -> x 
+                     | (Zero, x) -> b
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (Max.op x y)
                   = { reverse match }
                      Max.op (Max.op Zero b) c
                   = { case }
@@ -139,16 +111,16 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                         Max.op (S a') (Max.op Zero (S c'))
                      = { Max definition }
                         match (Zero, S c') with
-                        | (Zero, x) -> x 
+                        | (Zero, x) -> S c'
                         | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
+                        | (S x, S y) -> S (Max.op x y)
                      = { apply match }
                         Max.op (S a') (S c')
                      = { Max definition }
                         match (S a', Zero) with
                         | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
+                        | (x, Zero) -> S a'
+                        | (S x, S y) -> S (Max.op x y)
                      = { reverse match }
                         Max.op (Max.op (S a') Zero) (S c')
                      = { case }
@@ -163,15 +135,15 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                      = { Max definition }
                         match (S b', Zero) with
                         | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
+                        | (x, Zero) -> S b'
+                        | (S x, S y) -> S (Max.op x y)
                      = { apply match }
                         Max.op (S a') (S b')
                      = { Max defintion }
                         match ((Max.op (S a') (S b')), Zero) with
                         | (Zero, x) -> x 
-                        | (x, Zero) -> x
-                        | (S x, S y) -> S (max x y)
+                        | (x, Zero) -> Max.op (S a') (S b')
+                        | (S x, S y) -> S (Max.op x y)
                     = { reverse match }
                         Max.op (Max.op (S a') (S b')) Zero
                     = { case }
@@ -187,14 +159,14 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                      match (S b', S c') with
                      | (Zero, x) -> x 
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (Max.op b' c')
                   = { apply match }
                      Max.op (S a') (S (Max.op b' c'))
                   = { Max definition }
-                     match (S a', S (max b' c')) with
+                     match (S a', S (Max.op b' c')) with
                      | (Zero, x) -> x 
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (m y)
                   = { apply match }
                      S (Max.op a' (Max.op b' c'))
                   = { IH }
@@ -203,59 +175,23 @@ let _ = (module Max : Monoid) (* Proofs for this you have to write still *)
                      match (S (Max.op a' b'), S c') with
                      | (Zero, x) -> x 
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (Max.op (Max.op a' b') c')
                   = { reverse match }
                      Max.op (S (Max.op a' b')) (S c')
                   = { Max definition }
                      match (S a', S b') with
                      | (Zero, x) -> x 
                      | (x, Zero) -> x
-                     | (S x, S y) -> S (max x y)
+                     | (S x, S y) -> S (Max.op a' b')
                   = { reverse match }
                      Max.op (Max.op (S a') (S b')) (S c')
                   = { case }
                      Max.op (Max.op a b) c 
 
 -----------------------------------------------------------------------------------------------------------------------------------
-
-```ocaml
-module type Monoid = 
-sig
-	type t
-	(** id must be a left identity for op, i.e.
-	    [op id x = x]
-	    And id must also be a right identity, i.e.
-	    [op x id = x] **)
-	val id : t
-	(* op must be associative, i.e.
-	     [op (op x y) z = op x (op y z)] *)
-	val op : t -> t -> t
-end
-
-module Combine (M : Monoid) = struct
-   let rec combine_r lst =
-      match lst with
-      | []   -> M.id
-      | h :: t -> M.op h (combine_r t)
-
-   let rec combine_l acc lst =
-      match lst with
-      | []   -> acc
-      | h :: t -> (combine_l (M.op acc h) t)
-
-      
-end
-```
 -----------------------------------------------------------------------------------------------------------------------------------
 
-      combine_r [ [3;5] ; [1;4] ];;
-      - : int list = [3; 5; 1; 4]
-
       Prove combine_r lst = combine_l M.id lst (P4)
-      (* 
-      To prove this, you will have to do induction for a slightly stronger property instead (and then use it). The property you'll use is: 
-      M.op a (combine_r lst) = combine_l a lst. The properties about M.op and M.id you are allowed to use are written in the signature (so don't use that M.id = Zero, say; the proofs you did during lab show that that's not even necessarily true).
-      *)
 
          Base case: lst = []
 
@@ -270,7 +206,7 @@ end
                M.id
             = { combine_l definition }
                match [] with
-               | []   -> acc
+               | []   -> M.id
                | h :: t -> (combine_l (M.op acc h) t)
             = { reverse match }
                combine_l M.id []
@@ -289,20 +225,19 @@ end
                | h :: t -> M.op h (combine_r t)
             = { apply match }
                M.op h (combine_r t)
-            = { IH }
-               M.op h (combine_l M.id t) 
-            = { associative property }
-               M.op (combine_l h M.id) t
-            = { left property }
-               combine_l (M.op h M.id) t
+            = { LEMMA: M.op a (combine_r lst) = combine_l a lst }
+               combine_l h t
+            = { right identity }
+               combine_l (M.op M.id h) t
             = { combine_l definition }
                match h::t with
-               | []   -> acc
+               | []   -> h
                | h :: t -> (combine_l (M.op acc h) t)
             = { reverse match }
                combine_l M.id h::t
             = { case }
                combine_l M.id lst
+
 
       Prove M.op a (combine_r lst) = combine_l a lst:
          
@@ -321,8 +256,8 @@ end
                a
             = { combine_l definition }
                match [] with
-               | []   -> acc
-               | h :: t -> (combine_l (M.op acc h) t)
+               | []   -> a
+               | h :: t -> (combine_l (M.op a h) t)
             = { reverse match }
                combine_l a []
             = { case }
@@ -337,7 +272,7 @@ end
             = { combine_r definition }
                match h::t with
                | []   -> M.op a (M.id)
-               | h :: t -> M.op h (combine_r t)
+               | h :: t -> M.op a (M.op h (combine_r t))
             = { apply match }
                M.op a (M.op h (combine_r t))
             = { associative property }
@@ -346,7 +281,7 @@ end
                combine_l (M.op a h) t
             = { combine_l definition }
                match h::t with
-               | []   -> acc
+               | []   -> (M.op a h)
                | h :: t -> (combine_l (M.op a h) t)
             = { reverse match }
                combine_l a h::t
