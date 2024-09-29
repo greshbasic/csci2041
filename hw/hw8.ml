@@ -109,9 +109,7 @@ end
                       | _ -> false
                     = { reverse match }
                       is_some (Some ())
-
                     = { fn definition }
-
                       match h::t with
                       | [] -> None
                       | x::xs -> (match fn t with
@@ -188,7 +186,6 @@ end
 
 
                     Base case: lst = []
-
 
                       solve (filter lst)
                     = { case }
